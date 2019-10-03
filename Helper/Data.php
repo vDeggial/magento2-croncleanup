@@ -28,4 +28,9 @@ class Data extends DataHelper
     {
         return $this->getConfigValue('hapex_croncleanup/general/interval_running');
     }
+    
+    public function log($message)
+    {
+        $this->printLog("hapex_cron_cleanup", $message);
+    }
 }

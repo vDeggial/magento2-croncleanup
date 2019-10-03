@@ -30,7 +30,7 @@ class Cleanup
         $this->logger = $logger;
     }
 
-    public function execute()
+    public function cleanHistory()
     {
         if ($this->helperData->isEnabled())
         {
@@ -45,10 +45,35 @@ class Cleanup
                 if ($result)
                 {
                     $count = $result->rowCount();
-                    $this->logger->info("Hapex Cron Cleanup: $count cron jobs cleaned");
+                    $this->logger->info("Hapex Cron Cleanup: $count cron jobs scheduled before last $interval hour(s) cleaned");
                 }
             } catch (\Exception $e) {
-                $this->logger->critical(sprintf('Cron cleanup error: %s', $e->getMessage()));
+                $this->logger->critical(sprintf('Hapex History Cron cleanup error: %s', $e->getMessage()));
+            }
+    
+            return $this;
+        }
+    }
+    
+    public function cleanRunning()
+    {
+        if ($this->helperData->isEnabled())
+        {
+            $connection = $this->resource->getConnection();
+            $table = $this->resource->getTableName("cron_schedule");
+            $interval = $this->helperData->getIntervalRunning();
+            $interval = !empty($interval) ? $interval : 10;
+            $sql = "DELETE FROM $table WHERE executed_at < Date_sub(Now(), interval $interval minute) and status like 'running';";
+    
+            try {
+                $result = $connection->query($sql);
+                if ($result)
+                {
+                    $count = $result->rowCount();
+                    $this->logger->info("Hapex Cron Cleanup: $count cron jobs stuck for $interval minute(s) cleaned");
+                }
+            } catch (\Exception $e) {
+                $this->logger->critical(sprintf('Hapex Stuck Cron cleanup error: %s', $e->getMessage()));
             }
     
             return $this;

@@ -23,4 +23,9 @@ class Data extends DataHelper
     {
         return $this->getConfigValue('hapex_croncleanup/general/interval');
     }
+    
+    public function getIntervalRunning()
+    {
+        return $this->getConfigValue('hapex_croncleanup/general/interval_running');
+    }
 }

@@ -20,7 +20,8 @@
                     <comment>Cron cleaning is done on schedule</comment>
                 </field>
                 <field id="interval" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Interval (in hours)</label>
+                    <label>Interval</label>
+                    <comment> (in hours) | Default is 24 hours if left blank</comment>
                 </field>
             </group>
         </section>

@@ -37,7 +37,7 @@ class Cleanup
             $connection = $this->resource->getConnection();
             $table = $this->resource->getTableName("cron_schedule");
             $interval = $this->helperData->getInterval();
-            $interval = !empty($interval) ? $interval : 1;
+            $interval = !empty($interval) ? $interval : 24;
             $sql = "DELETE FROM $table WHERE scheduled_at < Date_sub(Now(), interval $interval hour);";
     
             try {

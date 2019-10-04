@@ -34,6 +34,7 @@ class Cleanup
     {
         if ($this->helperData->isEnabled())
         {
+            $this->helperData->log("");
             $this->helperData->log("--- Starting Cron History Cleanup ---");
             $connection = $this->resource->getConnection();
             $table = $this->resource->getTableName("cron_schedule");
@@ -46,7 +47,7 @@ class Cleanup
                 if ($result)
                 {
                     $count = $result->rowCount();
-                    $this->helperData->log("Results: $count cron jobs scheduled before last $interval hour(s) cleaned");
+                    $this->helperData->log("---- Cleaned $count cron jobs scheduled before last $interval hour(s) ----");
                 }
             } catch (\Exception $e) {
                 $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
@@ -64,19 +65,42 @@ class Cleanup
     {
         if ($this->helperData->isEnabled())
         {
+            $this->helperData->log("");
             $this->helperData->log("--- Starting Stuck Cron Cleanup ---");
             $connection = $this->resource->getConnection();
             $table = $this->resource->getTableName("cron_schedule");
             $interval = $this->helperData->getIntervalRunning();
             $interval = !empty($interval) ? $interval : 10;
-            $sql = "DELETE FROM $table WHERE (executed_at < Date_sub(Now(), interval $interval minute) or (scheduled_at < Date_sub(Now(), interval $interval minute) and executed_at is null)) and status like 'running';";
-    
+            
+            $part = "FROM $table WHERE (executed_at < Date_sub(Now(), interval $interval minute) or (scheduled_at < Date_sub(Now(), interval $interval minute) and executed_at is null)) and status like 'running'";
+            
+            $selectSql = "SELECT * " . $part;
+            $deleteSql = "DELETE " . $part;
+            
             try {
-                $result = $connection->query($sql);
+                $result = $connection->fetchAll($selectSql);
+                if ($result && is_array($result))
+                {
+                    $count = count($result);
+                    foreach($result as $row)
+                    {
+                        if (array_key_exists("job_code",$row))
+                        {
+                            $job = $row['job_code'];
+                            $this->helperData->log("---- Found a cron job '$job' that is stuck for at least $interval minute(s) ----");
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
+            }
+            try {
+                $result = $connection->query($deleteSql);
                 if ($result)
                 {
                     $count = $result->rowCount();
-                    $this->helperData->log("Results: $count cron jobs stuck for $interval or more minute(s) cleaned");
+                    $message = ($count > 0) ? "---- Cleaned $count cron jobs stuck for at least $interval minute(s) ----" : "---- Found no stuck cron jobs ----";
+                    $this->helperData->log($message);
                 }
             } catch (\Exception $e) {
                 $this->helperData->log(sprintf('Error: %s', $e->getMessage()));

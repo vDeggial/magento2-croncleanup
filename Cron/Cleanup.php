@@ -36,18 +36,19 @@ class Cleanup
         {
             $this->helperData->log("");
             $this->helperData->log("--- Starting Cron History Cleanup ---");
-            $connection = $this->resource->getConnection();
-            $table = $this->resource->getTableName("cron_schedule");
+            $connection = $this->resource ? $this->resource->getConnection() : null;
+            $table = $this->resource ? $this->resource->getTableName("cron_schedule") : null;
             $interval = $this->helperData->getInterval();
             $interval = !empty($interval) ? $interval : 24;
-            $sql = "DELETE FROM $table WHERE scheduled_at < Date_sub(Now(), interval $interval hour);";
-    
+            $sql = $connection && $table ? "DELETE FROM $table WHERE scheduled_at < Date_sub(Now(), interval $interval hour);" : null;
+            
+            $this->helperData->log("---- Looking for cron jobs scheduled before last $interval hour(s) ----");
             try {
-                $result = $connection->query($sql);
+                $result = $sql ? $connection->query($sql) : null;
                 if ($result)
                 {
                     $count = $result->rowCount();
-                    $this->helperData->log("---- Cleaned $count cron jobs scheduled before last $interval hour(s) ----");
+                    $this->helperData->log("---- Cleaned $count past cron jobs ----");
                 }
             } catch (\Exception $e) {
                 $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
@@ -67,18 +68,19 @@ class Cleanup
         {
             $this->helperData->log("");
             $this->helperData->log("--- Starting Stuck Cron Cleanup ---");
-            $connection = $this->resource->getConnection();
-            $table = $this->resource->getTableName("cron_schedule");
+            $connection = $this->resource ? $this->resource->getConnection() : null;
+            $table = $this->resource ? $this->resource->getTableName("cron_schedule") : null;
             $interval = $this->helperData->getIntervalRunning();
             $interval = !empty($interval) ? $interval : 10;
             
             $part = "FROM $table WHERE (executed_at < Date_sub(Now(), interval $interval minute) or (scheduled_at < Date_sub(Now(), interval $interval minute) and executed_at is null)) and status like 'running'";
             
-            $selectSql = "SELECT * " . $part;
-            $deleteSql = "DELETE " . $part;
+            $selectSql = $connection && $table ? "SELECT * " . $part : null;
+            $deleteSql = $connection && $table ? "DELETE " . $part : null;
             
+            $this->helperData->log("---- Looking for cron jobs that are stuck (running) for at least $interval minute(s) ----");
             try {
-                $result = $connection->fetchAll($selectSql);
+                $result = $selectSql ? $connection->fetchAll($selectSql) : null;
                 if ($result && is_array($result))
                 {
                     $count = count($result);
@@ -95,7 +97,7 @@ class Cleanup
                 $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
             }
             try {
-                $result = $connection->query($deleteSql);
+                $result = $deleteSql ? $connection->query($deleteSql) : null;
                 if ($result)
                 {
                     $count = $result->rowCount();

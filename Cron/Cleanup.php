@@ -62,7 +62,6 @@ class Cleanup
                 }
         
                 return $this;
-                break;
         }
     }
     
@@ -124,7 +123,6 @@ class Cleanup
                 }
         
                 return $this;
-                break;
         }
     }
 }

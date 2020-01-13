@@ -83,46 +83,53 @@ class Cleanup
                 $deleteSql = $connection && $table ? "DELETE " . $part : null;
                 
                 $this->helperData->log("---- Looking for cron jobs that are stuck (running) for at least $interval minute(s) ----");
-                try {
-                    $result = $selectSql ? $connection->fetchAll($selectSql) : null;
-                    switch($result !== null && is_array($result))
-                    {
-                        case true:
-                            $count = count($result);
-                            foreach($result as $row)
-                            {
-                                switch(array_key_exists("job_code",$row))
-                                {
-                                    case true:
-                                        $job = $row['job_code'];
-                                        $this->helperData->log("---- Found a cron job '$job' that is stuck for at least $interval minute(s) ----");
-                                        break;
-                                }
-                            }
-                            break;
-                    }
-                } catch (\Exception $e) {
-                    $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
-                }
-                try {
-                    $result = $deleteSql ? $connection->query($deleteSql) : null;
-                    switch($result)
-                    {
-                        case true:
-                            $count = $result->rowCount();
-                            $message = ($count > 0) ? "---- Cleaned $count cron jobs stuck for at least $interval minute(s) ----" : "---- Found no stuck cron jobs ----";
-                            $this->helperData->log($message);
-                            break;
-                    }
-                } catch (\Exception $e) {
-                    $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
-                }
-                finally
-                {
-                    $this->helperData->log("--- Ending Stuck Cron Cleanup ---");
-                }
+                $this->getStuckCronJobs($selectSql);
+                $this->deleteStuckCronJobs($deleteSql);
         
+                $this->helperData->log("--- Ending Stuck Cron Cleanup ---");
                 return $this;
+        }
+    }
+    
+    private function getStuckCronJobs($sql)
+    {
+        try {
+            $result = $sql ? $connection->fetchAll($sql) : null;
+            switch($result !== null && is_array($result))
+            {
+                case true:
+                    $count = count($result);
+                    foreach($result as $row)
+                    {
+                        switch(array_key_exists("job_code",$row))
+                        {
+                            case true:
+                                $job = $row['job_code'];
+                                $this->helperData->log("---- Found a cron job '$job' that is stuck for at least $interval minute(s) ----");
+                                break;
+                        }
+                    }
+                    break;
+            }
+        } catch (\Exception $e) {
+            $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
+        }
+    }
+    
+    private function deleteStuckCronJobs($sql)
+    {
+        try {
+            $result = $sql ? $connection->query($sql) : null;
+            switch($result)
+            {
+                case true:
+                    $count = $result->rowCount();
+                    $message = ($count > 0) ? "---- Cleaned $count cron jobs stuck for at least $interval minute(s) ----" : "---- Found no stuck cron jobs ----";
+                    $this->helperData->log($message);
+                    break;
+            }
+        } catch (\Exception $e) {
+            $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
         }
     }
 }

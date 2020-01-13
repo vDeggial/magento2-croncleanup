@@ -69,15 +69,15 @@ class Cleanup
                 $deleteSql = $connection && $table ? "DELETE " . $part : null;
                 
                 $this->helperData->log("---- Looking for cron jobs that are stuck (running) for at least $interval minute(s) ----");
-                $this->getStuckCronJobs($connection, $selectSql);
-                $this->deleteStuckCronJobs($connection, $deleteSql);
+                $this->getStuckCronJobs($connection, $selectSql, $interval);
+                $this->deleteStuckCronJobs($connection, $deleteSql, $interval);
         
                 $this->helperData->log("--- Ending Stuck Cron Cleanup ---");
                 return $this;
         }
     }
     
-    private function getStuckCronJobs($connection, $sql)
+    private function getStuckCronJobs($connection, $sql, $interval)
     {
         try {
             $result = $sql ? $connection->fetchAll($sql) : null;
@@ -118,7 +118,7 @@ class Cleanup
         }
     }
     
-    private function deleteStuckCronJobs($connection, $sql)
+    private function deleteStuckCronJobs($connection, $sql, $interval)
     {
         try {
             $result = $sql ? $connection->query($sql) : null;

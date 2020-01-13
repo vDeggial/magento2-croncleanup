@@ -44,7 +44,7 @@ class Cleanup
                 $sql = $connection && $table ? "DELETE FROM $table WHERE scheduled_at < Date_sub(Now(), interval $interval hour);" : null;
                 
                 $this->helperData->log("---- Looking for cron jobs scheduled before last $interval hour(s) ----");
-                $this->deleteCronHistory($sql);
+                $this->deleteCronHistory($connection, $sql);
                 
                 $this->helperData->log("--- Ending Cron History Cleanup ---");
                 return $this;
@@ -69,15 +69,15 @@ class Cleanup
                 $deleteSql = $connection && $table ? "DELETE " . $part : null;
                 
                 $this->helperData->log("---- Looking for cron jobs that are stuck (running) for at least $interval minute(s) ----");
-                $this->getStuckCronJobs($selectSql);
-                $this->deleteStuckCronJobs($deleteSql);
+                $this->getStuckCronJobs($connection, $selectSql);
+                $this->deleteStuckCronJobs($connection, $deleteSql);
         
                 $this->helperData->log("--- Ending Stuck Cron Cleanup ---");
                 return $this;
         }
     }
     
-    private function getStuckCronJobs($sql)
+    private function getStuckCronJobs($connection, $sql)
     {
         try {
             $result = $sql ? $connection->fetchAll($sql) : null;
@@ -102,7 +102,7 @@ class Cleanup
         }
     }
     
-    private function deleteCronHistory($sql)
+    private function deleteCronHistory($connection, $sql)
     {
         try {
             $result = $sql ? $connection->query($sql) : null;
@@ -118,7 +118,7 @@ class Cleanup
         }
     }
     
-    private function deleteStuckCronJobs($sql)
+    private function deleteStuckCronJobs($connection, $sql)
     {
         try {
             $result = $sql ? $connection->query($sql) : null;

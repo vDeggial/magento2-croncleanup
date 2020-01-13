@@ -44,23 +44,9 @@ class Cleanup
                 $sql = $connection && $table ? "DELETE FROM $table WHERE scheduled_at < Date_sub(Now(), interval $interval hour);" : null;
                 
                 $this->helperData->log("---- Looking for cron jobs scheduled before last $interval hour(s) ----");
-                try {
-                    $result = $sql ? $connection->query($sql) : null;
-                    switch($result !== null)
-                    {
-                        case true:
-                            $count = $result->rowCount();
-                            $this->helperData->log("---- Cleaned $count past cron jobs ----");
-                            break;
-                    }
-                } catch (\Exception $e) {
-                    $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
-                }
-                finally
-                {
-                    $this->helperData->log("--- Ending Cron History Cleanup ---");
-                }
-        
+                $this->deleteCronHistory($sql);
+                
+                $this->helperData->log("--- Ending Cron History Cleanup ---");
                 return $this;
         }
     }
@@ -109,6 +95,22 @@ class Cleanup
                                 break;
                         }
                     }
+                    break;
+            }
+        } catch (\Exception $e) {
+            $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
+        }
+    }
+    
+    private function deleteCronHistory($sql)
+    {
+        try {
+            $result = $sql ? $connection->query($sql) : null;
+            switch($result !== null)
+            {
+                case true:
+                    $count = $result->rowCount();
+                    $this->helperData->log("---- Cleaned $count past cron jobs ----");
                     break;
             }
         } catch (\Exception $e) {

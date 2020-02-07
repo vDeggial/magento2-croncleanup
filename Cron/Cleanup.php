@@ -83,7 +83,6 @@ class Cleanup
     {
         try {
             $result = $connection->fetchAll($sql);
-            $count = count($result);
             foreach ($result as $row) {
                 $job = $row['job_code'];
                 $this->helperData->log("---- Found a cron job '$job' that is stuck for at least $interval minute(s) ----");

@@ -31,17 +31,17 @@ class Cleanup
             case true:
                 try {
                     $this->helperData->log("");
-                    $this->helperData->log("--- Starting Cron History Cleanup ---");
+                    $this->helperData->log("Starting Cron History Cleanup");
                     $connection = $this->resource->getConnection();
                     $table = $this->resource->getTableName("cron_schedule");
                     $interval = $this->helperData->getInterval();
                     $interval = !empty($interval) ? $interval : 24;
                     $sql = "DELETE FROM $table WHERE scheduled_at < Date_sub(Now(), interval $interval hour);";
 
-                    $this->helperData->log("---- Looking for cron jobs scheduled before last $interval hour(s) ----");
+                    $this->helperData->log("- Looking for cron jobs scheduled before last $interval hour(s)");
                     $this->deleteCronHistory($connection, $sql);
 
-                    $this->helperData->log("--- Ending Cron History Cleanup ---");
+                    $this->helperData->log("Ending Cron History Cleanup");
                 } catch (\Exception $e) {
                     $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
                 } finally {
@@ -55,7 +55,7 @@ class Cleanup
                 case true:
                     try {
                         $this->helperData->log("");
-                        $this->helperData->log("--- Starting Stuck Cron Cleanup ---");
+                        $this->helperData->log("- Starting Stuck Cron Cleanup");
                         $connection = $this->resource->getConnection();
                         $table = $this->resource->getTableName("cron_schedule");
                         $interval = $this->helperData->getIntervalRunning();
@@ -66,11 +66,11 @@ class Cleanup
                         $selectSql = "SELECT * " . $part;
                         $deleteSql = "DELETE " . $part;
 
-                        $this->helperData->log("---- Looking for cron jobs that are stuck (running) for at least $interval minute(s) ----");
+                        $this->helperData->log("- Looking for cron jobs that are stuck (running) for at least $interval minute(s)");
                         $this->getStuckCronJobs($connection, $selectSql, $interval);
                         $this->deleteStuckCronJobs($connection, $deleteSql, $interval);
 
-                        $this->helperData->log("--- Ending Stuck Cron Cleanup ---");
+                        $this->helperData->log("Ending Stuck Cron Cleanup");
                     } catch (\Exception $e) {
                         $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
                     } finally {
@@ -85,7 +85,7 @@ class Cleanup
             $result = $connection->fetchAll($sql);
             foreach ($result as $row) {
                 $job = $row['job_code'];
-                $this->helperData->log("---- Found a cron job '$job' that is stuck for at least $interval minute(s) ----");
+                $this->helperData->log("-- Found a cron job '$job' that is stuck for at least $interval minute(s)");
             }
         } catch (\Exception $e) {
             $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
@@ -97,7 +97,7 @@ class Cleanup
         try {
             $result = $connection->query($sql);
             $count = $result->rowCount();
-            $this->helperData->log("---- Cleaned $count past cron jobs ----");
+            $this->helperData->log("- Cleaned $count past cron jobs");
         } catch (\Exception $e) {
             $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
         }
@@ -108,7 +108,7 @@ class Cleanup
         try {
             $result = $connection->query($sql);
             $count = $result->rowCount();
-            $message = ($count > 0) ? "---- Cleaned $count cron jobs stuck for at least $interval minute(s) ----" : "---- Found no stuck cron jobs ----";
+            $message = ($count > 0) ? "- Cleaned $count cron jobs stuck for at least $interval minute(s)" : "- Found no stuck cron jobs";
             $this->helperData->log($message);
         } catch (\Exception $e) {
             $this->helperData->log(sprintf('Error: %s', $e->getMessage()));

@@ -55,7 +55,7 @@ class Cleanup
                 case true:
                     try {
                         $this->helperData->log("");
-                        $this->helperData->log("- Starting Stuck Cron Cleanup");
+                        $this->helperData->log("Starting Stuck Cron Cleanup");
                         $connection = $this->resource->getConnection();
                         $table = $this->resource->getTableName("cron_schedule");
                         $interval = $this->helperData->getIntervalRunning();

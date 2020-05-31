@@ -27,6 +27,7 @@
                 <field id="cron_schedule_history" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Cron History Cleanup Schedule</label>
                     <comment>(Cron Expression) | Default: 0 * * * * (Once an Hour)</comment>
+                    <validate>validate-no-empty validate-length minimum-length-9</validate>
                 </field>
                 <field id="interval_running" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Stuck Cron Jobs Lifetime</label>
@@ -36,6 +37,7 @@
                 <field id="cron_schedule_stuck" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Stuck Cron Jobs Check Cleanup Schedule</label>
                     <comment>(Cron Expression) | Default: */10 * * * * (Every 10 Minutes)</comment>
+                    <validate>validate-no-empty validate-length minimum-length-9</validate>
                 </field>
             </group>
         </section>

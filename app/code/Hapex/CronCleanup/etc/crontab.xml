@@ -1,10 +1,10 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="default">
         <job name="hapex_croncleanup_history" instance="Hapex\CronCleanup\Cron\Cleanup" method="cleanHistory">
-            <schedule>* * * * *</schedule>
+            <config_path>hapex_croncleanup/general/cron_schedule_history</config_path>
         </job>
         <job name="hapex_croncleanup_stuck" instance="Hapex\CronCleanup\Cron\Cleanup" method="cleanStuckOnRunning">
-            <schedule>* * * * *</schedule>
+            <config_path>hapex_croncleanup/general/cron_schedule_stuck</config_path>
         </job>
     </group>
 </config>

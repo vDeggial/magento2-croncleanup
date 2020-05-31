@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
-        <tab id="hapex" translate="label" sortOrder="100">             
-            <label>Hapex</label> 
+        <tab id="hapex" translate="label" sortOrder="100">
+            <label>Hapex</label>
         </tab>
         <section id="hapex_croncleanup" translate="label" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
             <class>separator-top</class>
@@ -20,14 +20,22 @@
                     <comment>Cron cleaning is done on schedule</comment>
                 </field>
                 <field id="interval" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Keep Cron Job History For</label>
-                    <comment> (Hours) | Default: 24</comment>
+                    <label>Cron Job History Lifetime</label>
+                    <comment> Delete Cron Jobs Scheduled Before Last X Hours | Default: 24</comment>
                     <validate>validate-digits</validate>
                 </field>
-                <field id="interval_running" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Keep Stuck Cron Jobs For</label>
-                    <comment> (Minutes) | Default: 10</comment>
+                <field id="cron_schedule_history" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Cron History Cleanup Schedule</label>
+                    <comment>(Cron Expression) | Default: 0 * * * * (Once an Hour)</comment>
+                </field>
+                <field id="interval_running" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Stuck Cron Jobs Lifetime</label>
+                    <comment>Delete Cron Jobs That Are Stick For X Minutes | Default: 10</comment>
                     <validate>validate-digits</validate>
+                </field>
+                <field id="cron_schedule_stuck" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Stuck Cron Jobs Check Cleanup Schedule</label>
+                    <comment>(Cron Expression) | Default: */10 * * * * (Every 10 Minutes)</comment>
                 </field>
             </group>
         </section>

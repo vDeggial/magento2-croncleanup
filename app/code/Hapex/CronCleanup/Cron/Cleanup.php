@@ -43,7 +43,7 @@ class Cleanup
 
                     $this->helperData->log("Ending Cron History Cleanup");
                 } catch (\Exception $e) {
-                    $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
+                    $this->helperData->errorLog(__METHOD__, $e->getMessage());
                 } finally {
                     return $this;
                 }
@@ -72,7 +72,7 @@ class Cleanup
 
                         $this->helperData->log("Ending Stuck Cron Cleanup");
                     } catch (\Exception $e) {
-                        $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
+                        $this->helperData->errorLog(__METHOD__, $e->getMessage());
                     } finally {
                         return $this;
                     }
@@ -88,7 +88,7 @@ class Cleanup
                 $this->helperData->log("-- Found a cron job '$job' that is stuck within last $interval minute(s)");
             }
         } catch (\Exception $e) {
-            $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
+            $this->helperData->errorLog(__METHOD__, $e->getMessage());
         }
     }
 
@@ -99,7 +99,7 @@ class Cleanup
             $count = $result->rowCount();
             $this->helperData->log("- Cleaned $count past cron jobs");
         } catch (\Exception $e) {
-            $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
+            $this->helperData->errorLog(__METHOD__, $e->getMessage());
         }
     }
 
@@ -111,7 +111,7 @@ class Cleanup
             $message = ($count > 0) ? "- Cleaned $count cron jobs stuck within last $interval minute(s)" : "- Found no stuck cron jobs";
             $this->helperData->log($message);
         } catch (\Exception $e) {
-            $this->helperData->log(sprintf('Error: %s', $e->getMessage()));
+            $this->helperData->errorLog(__METHOD__, $e->getMessage());
         }
     }
 }

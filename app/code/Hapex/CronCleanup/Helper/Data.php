@@ -30,6 +30,6 @@ class Data extends DataHelper
 
 	public function log($message)
 	{
-		$this->printLog("hapex_cron_cleanup", $message);
+		$this->helperLog->printLog("hapex_cron_cleanup", $message);
 	}
 }

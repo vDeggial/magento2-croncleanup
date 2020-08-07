@@ -47,36 +47,36 @@ class Cleanup
                 } finally {
                     return $this;
                 }
-            }
+        }
     }
     public function cleanStuckOnRunning()
     {
         switch ($this->helperData->isEnabled()) {
-                case true:
-                    try {
-                        $this->helperData->log("");
-                        $this->helperData->log("Starting Stuck Cron Cleanup");
-                        $connection = $this->resource->getConnection();
-                        $table = $this->resource->getTableName("cron_schedule");
-                        $interval = $this->helperData->getIntervalRunning();
-                        $interval = !empty($interval) ? $interval : 10;
+            case true:
+                try {
+                    $this->helperData->log("");
+                    $this->helperData->log("Starting Stuck Cron Cleanup");
+                    $connection = $this->resource->getConnection();
+                    $table = $this->resource->getTableName("cron_schedule");
+                    $interval = $this->helperData->getIntervalRunning();
+                    $interval = !empty($interval) ? $interval : 10;
 
-                        $part = "FROM $table WHERE (executed_at < Date_sub(Now(), interval $interval minute) or (scheduled_at < Date_sub(Now(), interval $interval minute) and executed_at is null)) and status like 'running'";
+                    $part = "FROM $table WHERE (executed_at < Date_sub(Now(), interval $interval minute) or (scheduled_at < Date_sub(Now(), interval $interval minute) and executed_at is null)) and status like 'running'";
 
-                        $selectSql = "SELECT * " . $part;
-                        $deleteSql = "DELETE " . $part;
+                    $selectSql = "SELECT * " . $part;
+                    $deleteSql = "DELETE " . $part;
 
-                        $this->helperData->log("- Looking for cron jobs that are stuck running within last $interval minute(s)");
-                        $this->getStuckCronJobs($connection, $selectSql, $interval);
-                        $this->deleteStuckCronJobs($connection, $deleteSql, $interval);
+                    $this->helperData->log("- Looking for cron jobs that are stuck running within last $interval minute(s)");
+                    $this->getStuckCronJobs($connection, $selectSql, $interval);
+                    $this->deleteStuckCronJobs($connection, $deleteSql, $interval);
 
-                        $this->helperData->log("Ending Stuck Cron Cleanup");
-                    } catch (\Exception $e) {
-                        $this->helperData->errorLog(__METHOD__, $e->getMessage());
-                    } finally {
-                        return $this;
-                    }
+                    $this->helperData->log("Ending Stuck Cron Cleanup");
+                } catch (\Exception $e) {
+                    $this->helperData->errorLog(__METHOD__, $e->getMessage());
+                } finally {
+                    return $this;
                 }
+        }
     }
 
     private function getStuckCronJobs($connection, $sql, $interval)

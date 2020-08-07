@@ -1,15 +1,14 @@
 <?xml version="1.0"?>
-     <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
-        <default>
-            <hapex_croncleanup>
-                <general>
-                    <enable>1</enable>
-                    <interval>24</interval>
-                    <cron_schedule_history>0 * * * *</cron_schedule_history>
-                    <interval_running>10</interval_running>
-                    <cron_schedule_stuck>*/10 * * * *</cron_schedule_stuck>
-                </general>
-            </hapex_croncleanup>
-        </default>
-    </config>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <hapex_croncleanup>
+            <general>
+                <enable>1</enable>
+                <interval>24</interval>
+                <cron_schedule_history>0 * * * *</cron_schedule_history>
+                <interval_running>10</interval_running>
+                <cron_schedule_stuck>*/10 * * * *</cron_schedule_stuck>
+            </general>
+        </hapex_croncleanup>
+    </default>
+</config>

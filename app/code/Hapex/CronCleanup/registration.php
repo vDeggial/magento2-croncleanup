@@ -1,3 +1,3 @@
 <?php
 \Magento\Framework\Component\ComponentRegistrar::register
-(\Magento\Framework\Component\ComponentRegistrar::MODULE,'Hapex_CronCleanup',__DIR__);
+    (\Magento\Framework\Component\ComponentRegistrar::MODULE, 'Hapex_CronCleanup', __DIR__);

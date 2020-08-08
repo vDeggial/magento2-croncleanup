@@ -1,4 +1,5 @@
 <?php
+
 namespace Hapex\CronCleanup\Helper;
 
 use Hapex\Core\Helper\DataHelper;

@@ -1,29 +1,19 @@
 <?php
 
 namespace Hapex\CronCleanup\Cron;
-
-use Hapex\CronCleanup\Helper\Data as DataHelper;
+use Hapex\Core\Cron\BaseCron;
+use Hapex\Core\Helper\LogHelper;
 use Magento\Framework\App\ResourceConnection;
-use Psr\Log\LoggerInterface;
+use Hapex\CronCleanup\Helper\Data as DataHelper;
 
-class Cleanup
+class Cleanup extends BaseCron
 {
-    /**
-     * @var ResourceConnection
-     */
     protected $resource;
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
 
-    private $helperData;
-
-    public function __construct(DataHelper $helperData, ResourceConnection $resource, LoggerInterface $logger)
+    public function __construct(DataHelper $helperData, LogHelper $helperLog, ResourceConnection $resource)
     {
-        $this->helperData = $helperData;
+        parent::__construct($helperData, $helperLog);
         $this->resource = $resource;
-        $this->logger = $logger;
     }
 
     public function cleanHistory()
@@ -44,7 +34,7 @@ class Cleanup
 
                     $this->helperData->log("Ending Cron History Cleanup");
                 } catch (\Exception $e) {
-                    $this->helperData->errorLog(__METHOD__, $e->getMessage());
+                    $this->helperLog->errorLog(__METHOD__, $e->getMessage());
                 } finally {
                     return $this;
                 }
@@ -73,7 +63,7 @@ class Cleanup
 
                     $this->helperData->log("Ending Stuck Cron Cleanup");
                 } catch (\Exception $e) {
-                    $this->helperData->errorLog(__METHOD__, $e->getMessage());
+                    $this->helperLog->errorLog(__METHOD__, $e->getMessage());
                 } finally {
                     return $this;
                 }
@@ -89,7 +79,7 @@ class Cleanup
                 $this->helperData->log("-- Found a cron job '$job' that is stuck within last $interval minute(s)");
             }
         } catch (\Exception $e) {
-            $this->helperData->errorLog(__METHOD__, $e->getMessage());
+            $this->helperLog->errorLog(__METHOD__, $e->getMessage());
         }
     }
 
@@ -100,7 +90,7 @@ class Cleanup
             $count = $result->rowCount();
             $this->helperData->log("- Cleaned $count past cron jobs");
         } catch (\Exception $e) {
-            $this->helperData->errorLog(__METHOD__, $e->getMessage());
+            $this->helperLog->errorLog(__METHOD__, $e->getMessage());
         }
     }
 
@@ -112,7 +102,7 @@ class Cleanup
             $message = ($count > 0) ? "- Cleaned $count cron jobs stuck within last $interval minute(s)" : "- Found no stuck cron jobs";
             $this->helperData->log($message);
         } catch (\Exception $e) {
-            $this->helperData->errorLog(__METHOD__, $e->getMessage());
+            $this->helperLog->errorLog(__METHOD__, $e->getMessage());
         }
     }
 }

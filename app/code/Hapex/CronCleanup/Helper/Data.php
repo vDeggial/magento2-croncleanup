@@ -8,6 +8,10 @@ use Magento\Framework\ObjectManagerInterface;
 
 class Data extends DataHelper
 {
+    protected const XML_PATH_CONFIG_ENABLED = "hapex_croncleanup/general/enable";
+    protected const XML_PATH_CONFIG_INTERVAL = "hapex_croncleanup/general/interval";
+    protected const XML_PATH_CONFIG_INTERVAL_RUNNING = "hapex_croncleanup/general/interval_running";
+    protected const FILE_PATH_LOG = "hapex_cron_cleanup";
     public function __construct(Context $context, ObjectManagerInterface $objectManager)
     {
 
@@ -16,21 +20,21 @@ class Data extends DataHelper
 
     public function isEnabled()
     {
-        return $this->getConfigFlag('hapex_croncleanup/general/enable');
+        return $this->getConfigFlag(self::XML_PATH_CONFIG_ENABLED);
     }
 
     public function getInterval()
     {
-        return $this->getConfigValue('hapex_croncleanup/general/interval');
+        return $this->getConfigValue(self::XML_PATH_CONFIG_INTERVAL);
     }
 
     public function getIntervalRunning()
     {
-        return $this->getConfigValue('hapex_croncleanup/general/interval_running');
+        return $this->getConfigValue(self::XML_PATH_CONFIG_INTERVAL_RUNNING);
     }
 
     public function log($message)
     {
-        $this->helperLog->printLog("hapex_cron_cleanup", $message);
+        $this->helperLog->printLog(self::FILE_PATH_LOG, $message);
     }
 }

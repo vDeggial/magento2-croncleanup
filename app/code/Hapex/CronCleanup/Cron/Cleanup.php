@@ -1,6 +1,7 @@
 <?php
 
 namespace Hapex\CronCleanup\Cron;
+
 use Hapex\Core\Cron\BaseCron;
 use Hapex\Core\Helper\LogHelper;
 use Magento\Framework\App\ResourceConnection;
@@ -70,20 +71,23 @@ class Cleanup extends BaseCron
         }
     }
 
-    private function getStuckCronJobs($connection, $sql, $interval)
+    protected function getStuckCronJobs($connection, $sql, $interval)
     {
         try {
             $result = $connection->fetchAll($sql);
-            foreach ($result as $row) {
-                $job = $row['job_code'];
-                $this->helperData->log("-- Found a cron job '$job' that is stuck within last $interval minute(s)");
-            }
+            array_walk($result, function ($row) use (&$interval) {
+                $job = $this->helperData->getArrayValue($row, "job_code");
+                if(isset($job))
+                {
+                    $this->helperData->log("-- Found a cron job '$job' that is stuck within last $interval minute(s)");
+                }
+            });
         } catch (\Exception $e) {
             $this->helperLog->errorLog(__METHOD__, $e->getMessage());
         }
     }
 
-    private function deleteCronHistory($connection, $sql)
+    protected function deleteCronHistory($connection, $sql)
     {
         try {
             $result = $connection->query($sql);
@@ -94,7 +98,7 @@ class Cleanup extends BaseCron
         }
     }
 
-    private function deleteStuckCronJobs($connection, $sql, $interval)
+    protected function deleteStuckCronJobs($connection, $sql, $interval)
     {
         try {
             $result = $connection->query($sql);

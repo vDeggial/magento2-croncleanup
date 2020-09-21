@@ -10,11 +10,13 @@ use Hapex\CronCleanup\Helper\Data as DataHelper;
 class Cleanup extends BaseCron
 {
     protected $resource;
+    protected $connection;
 
     public function __construct(DataHelper $helperData, LogHelper $helperLog, ResourceConnection $resource)
     {
         parent::__construct($helperData, $helperLog);
         $this->resource = $resource;
+        $this->connection = $this->resource->getConnection();
     }
 
     public function cleanHistory()
@@ -24,14 +26,13 @@ class Cleanup extends BaseCron
                 try {
                     $this->helperData->log("");
                     $this->helperData->log("Starting Cron History Cleanup");
-                    $connection = $this->resource->getConnection();
                     $table = $this->resource->getTableName("cron_schedule");
                     $interval = $this->helperData->getInterval();
                     $interval = !empty($interval) ? $interval : 24;
                     $sql = "DELETE FROM $table WHERE scheduled_at < Date_sub(Now(), interval $interval hour);";
 
                     $this->helperData->log("- Looking for cron jobs scheduled before last $interval hour(s)");
-                    $this->deleteCronHistory($connection, $sql);
+                    $this->deleteCronHistory($sql);
 
                     $this->helperData->log("Ending Cron History Cleanup");
                 } catch (\Exception $e) {
@@ -48,7 +49,6 @@ class Cleanup extends BaseCron
                 try {
                     $this->helperData->log("");
                     $this->helperData->log("Starting Stuck Cron Cleanup");
-                    $connection = $this->resource->getConnection();
                     $table = $this->resource->getTableName("cron_schedule");
                     $interval = $this->helperData->getIntervalRunning();
                     $interval = !empty($interval) ? $interval : 10;
@@ -59,8 +59,8 @@ class Cleanup extends BaseCron
                     $deleteSql = "DELETE " . $part;
 
                     $this->helperData->log("- Looking for cron jobs that are stuck running within last $interval minute(s)");
-                    $this->getStuckCronJobs($connection, $selectSql, $interval);
-                    $this->deleteStuckCronJobs($connection, $deleteSql, $interval);
+                    $this->getStuckCronJobs($selectSql, $interval);
+                    $this->deleteStuckCronJobs($deleteSql, $interval);
 
                     $this->helperData->log("Ending Stuck Cron Cleanup");
                 } catch (\Exception $e) {
@@ -71,10 +71,10 @@ class Cleanup extends BaseCron
         }
     }
 
-    protected function getStuckCronJobs($connection, $sql, $interval)
+    protected function getStuckCronJobs($sql, $interval)
     {
         try {
-            $result = $connection->fetchAll($sql);
+            $result = $this->connection->fetchAll($sql);
             array_walk($result, function ($row) use (&$interval) {
                 $job = $this->helperData->getArrayValue($row, "job_code");
                 if(isset($job))
@@ -87,10 +87,10 @@ class Cleanup extends BaseCron
         }
     }
 
-    protected function deleteCronHistory($connection, $sql)
+    protected function deleteCronHistory($sql)
     {
         try {
-            $result = $connection->query($sql);
+            $result = $this->connection->query($sql);
             $count = $result->rowCount();
             $this->helperData->log("- Cleaned $count past cron jobs");
         } catch (\Exception $e) {
@@ -98,10 +98,10 @@ class Cleanup extends BaseCron
         }
     }
 
-    protected function deleteStuckCronJobs($connection, $sql, $interval)
+    protected function deleteStuckCronJobs($sql, $interval)
     {
         try {
-            $result = $connection->query($sql);
+            $result = $this->connection->query($sql);
             $count = $result->rowCount();
             $message = ($count > 0) ? "- Cleaned $count cron jobs stuck within last $interval minute(s)" : "- Found no stuck cron jobs";
             $this->helperData->log($message);

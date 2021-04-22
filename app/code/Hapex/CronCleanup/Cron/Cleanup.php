@@ -75,10 +75,10 @@ class Cleanup extends BaseCron
     {
         try {
             $result = $this->connection->fetchAll($sql);
+
             array_walk($result, function ($row) use (&$interval) {
-                $job = $this->helperData->getArrayValue($row, "job_code");
-                if(isset($job))
-                {
+                $job = isset($row["job_code"]) ? $row["job_code"] : null;
+                if (isset($job)) {
                     $this->helperData->log("-- Found a cron job '$job' that is stuck within last $interval minute(s)");
                 }
             });

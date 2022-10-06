@@ -35,7 +35,7 @@ class Cleanup extends BaseCron
                     $this->deleteCronHistory($sql);
 
                     $this->helperData->log("Ending Cron History Cleanup");
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     $this->helperLog->errorLog(__METHOD__, $e->getMessage());
                 } finally {
                     return $this;
@@ -63,7 +63,7 @@ class Cleanup extends BaseCron
                     $this->deleteStuckCronJobs($deleteSql, $interval);
 
                     $this->helperData->log("Ending Stuck Cron Cleanup");
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     $this->helperLog->errorLog(__METHOD__, $e->getMessage());
                 } finally {
                     return $this;
@@ -82,7 +82,7 @@ class Cleanup extends BaseCron
                     $this->helperData->log("-- Found a cron job '$job' that is stuck within last $interval minute(s)");
                 }
             });
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->helperLog->errorLog(__METHOD__, $e->getMessage());
         }
     }
@@ -93,7 +93,7 @@ class Cleanup extends BaseCron
             $result = $this->connection->query($sql);
             $count = $result->rowCount();
             $this->helperData->log("- Cleaned $count past cron jobs");
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->helperLog->errorLog(__METHOD__, $e->getMessage());
         }
     }
@@ -105,7 +105,7 @@ class Cleanup extends BaseCron
             $count = $result->rowCount();
             $message = ($count > 0) ? "- Cleaned $count cron jobs stuck within last $interval minute(s)" : "- Found no stuck cron jobs";
             $this->helperData->log($message);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->helperLog->errorLog(__METHOD__, $e->getMessage());
         }
     }

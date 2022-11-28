@@ -1,5 +1,5 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
-    <group id="default">
+    <group id="hapex">
         <job name="hapex_croncleanup_history" instance="Hapex\CronCleanup\Cron\Cleanup" method="cleanHistory">
             <config_path>hapex_croncleanup/general/cron_schedule_history</config_path>
         </job>

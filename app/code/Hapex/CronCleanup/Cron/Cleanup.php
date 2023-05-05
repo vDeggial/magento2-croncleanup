@@ -21,7 +21,7 @@ class Cleanup extends BaseCron
 
     public function cleanHistory()
     {
-        switch ($this->helperData->isEnabled()) {
+        switch (!$this->isMaintenance && $this->helperData->isEnabled()) {
             case true:
                 try {
                     $this->helperData->log("");
